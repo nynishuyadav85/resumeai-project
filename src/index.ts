@@ -2,6 +2,7 @@ import express, {Request, Response} from "express"
 import dotenv from 'dotenv'
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
+import { analyzeResume } from "./aiService";
 
 dotenv.config();
 
@@ -24,17 +25,26 @@ app.post('/api/analyze' , async (req: Request, res: Response)=> {
             return res.status(400).json({error: 'Resume aur Job Description dono zaroori hain'})
         }
 
-        const newanalysis = await prisma.analysis.create({
+        const aiResponseString = await analyzeResume(jobDescription, resumeText)
+
+        console.log("🤖 AI se analysis shuru...");
+
+
+
+        const newAnalysis = await prisma.analysis.create({
             data: {
                 resumeText,
                 jobDescription,
-                aiResponse: 'Day 3 mein yahan asli AI response aayega. Abhi ye dummy text hai.'
+                aiResponse: aiResponseString
             }
         })
 
-        res.status(200).json({
-            message: 'Data successfully saved!',
-            data: newanalysis
+        res.status(201).json({
+            message: 'Analysis successful!',
+            data: {
+                id: newAnalysis.id,
+                analysisResult: JSON.parse(aiResponseString)
+            }
         })
     } catch (error) {
         
