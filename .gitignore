@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables (NEVER COMMIT THIS)
+.env
+
+# OS files
+.DS_Store
